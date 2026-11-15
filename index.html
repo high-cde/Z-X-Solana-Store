@@ -14,12 +14,16 @@
     .search-btn { background: #00ff9d; color: #000; font-weight: bold; }
     .warning { background: #332200; padding: 10px; border-left: 4px solid #ffaa00; }
     .comm { font-size: 0.85em; color: #aaa; margin-top: 10px; }
+    #walletInfo { font-size: 0.85em; margin-left: 10px; }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>Z-X SOLANA <small>by ZDOS · prototipo comunicante</small></h1>
-    <button>Collega Phantom</button>
+    <div>
+      <button id="connectBtn" onclick="connectWallet()">Collega Phantom</button>
+      <span id="walletInfo"></span>
+    </div>
   </div>
 
   <div class="tabs">
@@ -58,13 +62,14 @@
     <select id="country"><option>Portogallo</option><option>Italia</option><option>Spagna</option></select>
     <button onclick="provisionEsim()">Richiedi provisioning (lab)</button>
     <div id="esimResult"></div>
-    <div class="comm">Comunicazione: ZComm.provisionEsim() → record su DSN → gate $DSN.</div>
+    <div class="comm">Comunicazione: ZComm.provisionEsim() → record su DSN → gate $DSN (richiede wallet collegato).</div>
   </div>
 
   <div id="store" class="panel" style="display:none">
     <h2>Store Crypto</h2>
     <p>Solana Pay (SOL / USDC) pianificato. VELVET non usato per bassa liquidità.</p>
-    <div class="comm">Comunicazione: pagamento → verifica balance via Æsir/zBAG → conferma.</div>
+    <p id="storeWallet">Wallet non collegato.</p>
+    <div class="comm">Comunicazione: pagamento → verifica balance via Æsir/zBAG → conferma. Token $DSN: 35w74RT77BPSYNpmzpvxmR9wu2ihpgzubKy4bkGHR3F4</div>
   </div>
 
   <div id="xcloud" class="panel" style="display:none">
@@ -75,6 +80,26 @@
   </div>
 
   <script>
+    let walletAddress = null;
+
+    async function connectWallet() {
+      if (!window.solana || !window.solana.isPhantom) {
+        alert('Phantom non trovato. Installa l\'estensione Phantom.');
+        return;
+      }
+      try {
+        const resp = await window.solana.connect();
+        walletAddress = resp.publicKey.toString();
+        document.getElementById('walletInfo').textContent = walletAddress.slice(0,4) + '...' + walletAddress.slice(-4);
+        document.getElementById('connectBtn').textContent = 'Connesso';
+        document.getElementById('storeWallet').textContent = 'Wallet: ' + walletAddress;
+        console.log('Wallet collegato:', walletAddress);
+      } catch (err) {
+        console.error(err);
+        alert('Connessione rifiutata o errore.');
+      }
+    }
+
     function show(id) {
       document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
       document.getElementById(id).style.display = 'block';
@@ -86,8 +111,12 @@
       document.getElementById('scudoResult').innerHTML = '<p style="color:#ff4444">ROSSO — rischio alto (simulazione). Sosia o dominio non ufficiale.<br>Evento inviato a Security Agent.</p>';
     }
     function provisionEsim() {
+      if (!walletAddress) {
+        alert('Collega prima il wallet Phantom.');
+        return;
+      }
       const country = document.getElementById('country').value;
-      document.getElementById('esimResult').innerHTML = '<p style="color:#00ff9d">Provisioning laboratorio avviato per ' + country + '.<br>Token simulato generato via ZComm → replica DSN.</p>';
+      document.getElementById('esimResult').innerHTML = '<p style="color:#00ff9d">Provisioning laboratorio avviato per ' + country + ' (wallet: ' + walletAddress.slice(0,8) + '...).<br>Token simulato generato via ZComm → replica DSN.</p>';
     }
     function search() {
       alert('Ricerca avviata. Link partner saranno filtrati da Scudo K.I.R.A.');
