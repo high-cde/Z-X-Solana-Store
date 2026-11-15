@@ -2,6 +2,12 @@
 
 Prototipo di agenzia viaggi + eSIM + store crypto sovrano, integrato nell'ecosistema ZDOS.
 
+## Demo live (GitHub Pages)
+
+**https://high-cde.github.io/Z-X-Solana-Store/**
+
+(Abilita Pages in Settings → Pages → Branch `main` / root se non è ancora attivo.)
+
 ## Funzionalità
 
 - Ricerca destinazioni, mappe (OpenStreetMap), meteo, info città.
@@ -20,7 +26,6 @@ Prototipo dimostrativo (M1). Nessuna prenotazione o pagamento reale in questa ve
 ## Avvio locale
 
 ```sh
-# Apri index.html nel browser o servi con un server statico
 python3 -m http.server 8080
 # Poi http://localhost:8080
 ```
