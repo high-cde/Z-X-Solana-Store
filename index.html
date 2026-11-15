@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Z-X SOLANA — Store & Viaggi</title>
+  <style>
+    body { background: #0a0014; color: #e0e0ff; font-family: system-ui, sans-serif; margin: 0; padding: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; background: #1a0033; padding: 10px 20px; border-radius: 12px; }
+    .tabs button { background: #2a0055; color: #fff; border: none; padding: 8px 16px; margin: 4px; border-radius: 8px; cursor: pointer; }
+    .tabs button.active { background: #6c2bd9; }
+    .panel { background: #120022; padding: 20px; border-radius: 12px; margin-top: 20px; }
+    input, select, button { padding: 8px; margin: 4px; border-radius: 6px; }
+    .search-btn { background: #00ff9d; color: #000; font-weight: bold; }
+    .warning { background: #332200; padding: 10px; border-left: 4px solid #ffaa00; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Z-X SOLANA <small>by ZDOS · prototipo</small></h1>
+    <button>Collega Phantom</button>
+  </div>
+
+  <div class="tabs">
+    <button class="active" onclick="show('viaggi')">Viaggi</button>
+    <button onclick="show('scudo')">Scudo K.I.R.A.</button>
+    <button onclick="show('esim')">eSIM</button>
+    <button onclick="show('store')">Store</button>
+    <button onclick="show('xcloud')">xCLOUD</button>
+  </div>
+
+  <div id="viaggi" class="panel">
+    <h2>Viaggia, connettiti e paga in stile Solana</h2>
+    <div class="warning">Prototipo dimostrativo: niente prenotazioni, niente pagamenti, niente link affiliati attivi.</div>
+    <div>
+      <input placeholder="Da" value="Roma">
+      <input placeholder="A" value="Lisbona">
+      <input type="date">
+      <input type="date">
+      <button class="search-btn">CERCA</button>
+    </div>
+    <p>Mappa OpenStreetMap, meteo Open-Meteo, hotel vicini, convertitore valuta e link partner verranno caricati qui.</p>
+    <p>Integrazione Scudo K.I.R.A. attiva su tutti i link esterni.</p>
+  </div>
+
+  <div id="scudo" class="panel" style="display:none">
+    <h2>Scudo K.I.R.A. ANTI-SCAM</h2>
+    <input id="checkUrl" placeholder="https://..." style="width:60%">
+    <button onclick="checkDomain()">Controlla</button>
+    <div id="scudoResult"></div>
+  </div>
+
+  <div id="esim" class="panel" style="display:none">
+    <h2>eSIM LEVEL 2</h2>
+    <p>Scegli paese → link al provider / comparatore (Airalo, ecc.). Nessun prezzo inventato.</p>
+    <select><option>Portogallo</option><option>Italia</option><option>Spagna</option></select>
+    <button>Vedi piani</button>
+  </div>
+
+  <div id="store" class="panel" style="display:none">
+    <h2>Store Crypto</h2>
+    <p>Solana Pay (SOL / USDC) pianificato. VELVET non usato per bassa liquidità.</p>
+  </div>
+
+  <div id="xcloud" class="panel" style="display:none">
+    <h2>xCLOUD · Starlink Dish</h2>
+    <p>Pannello mock (dati di prova). Per live: server locale su rete Starlink.</p>
+    <p>ZComm chat cifrata disponibile.</p>
+  </div>
+
+  <script>
+    function show(id) {
+      document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+      document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+    function checkDomain() {
+      const url = document.getElementById('checkUrl').value;
+      document.getElementById('scudoResult').innerHTML = '<p style="color:#ff4444">ROSSO — rischio alto (simulazione). Sosia o dominio non ufficiale.</p>';
+    }
+  </script>
+</body>
+</html>
