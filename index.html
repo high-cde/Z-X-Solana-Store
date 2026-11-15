@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Z-X SOLANA — Store & Viaggi</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     body { background: #0a0014; color: #e0e0ff; font-family: system-ui, sans-serif; margin: 0; padding: 20px; }
     .header { display: flex; justify-content: space-between; align-items: center; background: #1a0033; padding: 10px 20px; border-radius: 12px; }
@@ -16,6 +18,9 @@
     .comm { font-size: 0.85em; color: #aaa; margin-top: 10px; }
     #walletInfo { font-size: 0.85em; margin-left: 10px; }
     .token { font-family: monospace; font-size: 0.8em; word-break: break-all; }
+    #map { height: 320px; border-radius: 12px; margin: 15px 0; }
+    .weather { background: #1a0033; padding: 12px; border-radius: 8px; margin-top: 10px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   </style>
 </head>
 <body>
@@ -38,15 +43,16 @@
   <div id="viaggi" class="panel">
     <h2>Viaggia, connettiti e paga in stile Solana</h2>
     <div class="warning">Prototipo dimostrativo: niente prenotazioni, niente pagamenti, niente link affiliati attivi.</div>
-    <div>
-      <input placeholder="Da" value="Roma">
-      <input placeholder="A" value="Lisbona">
+    <div class="row">
+      <input id="from" placeholder="Da" value="Roma">
+      <input id="to" placeholder="A" value="Lisbona">
       <input type="date">
       <input type="date">
       <button class="search-btn" onclick="search()">CERCA</button>
     </div>
-    <p>Mappa OpenStreetMap, meteo Open-Meteo, hotel vicini, convertitore valuta e link partner verranno caricati qui.</p>
-    <div class="comm">Comunicazione: ogni link esterno → Scudo K.I.R.A. / Security Agent prima del redirect.</div>
+    <div id="map"></div>
+    <div id="weather" class="weather">Caricamento meteo...</div>
+    <div class="comm">Comunicazione: ogni link esterno → Scudo K.I.R.A. / Security Agent prima del redirect. Mappa: OpenStreetMap · Meteo: Open-Meteo</div>
   </div>
 
   <div id="scudo" class="panel" style="display:none">
@@ -86,6 +92,45 @@
 
   <script>
     let walletAddress = null;
+    let map = null;
+
+    // Default: Lisbona
+    const defaultLat = 38.7223;
+    const defaultLon = -9.1393;
+
+    function initMap() {
+      if (map) return;
+      map = L.map('map').setView([defaultLat, defaultLon], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      L.marker([defaultLat, defaultLon]).addTo(map).bindPopup('Lisbona').openPopup();
+    }
+
+    async function loadWeather(lat = defaultLat, lon = defaultLon) {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const cw = data.current_weather;
+        const daily = data.daily;
+        document.getElementById('weather').innerHTML = `
+          <strong>Meteo Lisbona</strong><br>
+          Temperatura attuale: <strong>${cw.temperature}°C</strong><br>
+          Vento: ${cw.windspeed} km/h<br>
+          Oggi: ${daily.temperature_2m_max[0]}°C / ${daily.temperature_2m_min[0]}°C<br>
+          Fonte: Open-Meteo
+        `;
+      } catch (e) {
+        document.getElementById('weather').textContent = 'Errore caricamento meteo';
+      }
+    }
+
+    function search() {
+      const dest = document.getElementById('to').value || 'Lisbona';
+      alert('Ricerca avviata per ' + dest + '. Link partner saranno filtrati da Scudo K.I.R.A.');
+      // In futuro: geocoding Nominatim + aggiorna mappa/meteo
+    }
 
     async function connectWallet() {
       if (!window.solana || !window.solana.isPhantom) {
@@ -98,9 +143,7 @@
         document.getElementById('walletInfo').textContent = walletAddress.slice(0,4) + '...' + walletAddress.slice(-4);
         document.getElementById('connectBtn').textContent = 'Connesso';
         document.getElementById('storeWallet').textContent = 'Wallet: ' + walletAddress;
-        console.log('Wallet collegato:', walletAddress);
       } catch (err) {
-        console.error(err);
         alert('Connessione rifiutata o errore.');
       }
     }
@@ -110,11 +153,19 @@
       document.getElementById(id).style.display = 'block';
       document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
       event.target.classList.add('active');
+      if (id === 'viaggi') {
+        setTimeout(() => {
+          initMap();
+          if (map) map.invalidateSize();
+        }, 100);
+      }
     }
+
     function checkDomain() {
       const url = document.getElementById('checkUrl').value;
       document.getElementById('scudoResult').innerHTML = '<p style="color:#ff4444">ROSSO — rischio alto (simulazione). Sosia o dominio non ufficiale.<br>Evento inviato a Security Agent.</p>';
     }
+
     function provisionEsim() {
       if (!walletAddress) {
         alert('Collega prima il wallet Phantom.');
@@ -123,9 +174,12 @@
       const country = document.getElementById('country').value;
       document.getElementById('esimResult').innerHTML = '<p style="color:#00ff9d">Provisioning laboratorio avviato per ' + country + ' (wallet: ' + walletAddress.slice(0,8) + '...).<br>Token simulato generato via ZComm → replica DSN.</p>';
     }
-    function search() {
-      alert('Ricerca avviata. Link partner saranno filtrati da Scudo K.I.R.A.');
-    }
+
+    // Init on load
+    window.onload = () => {
+      initMap();
+      loadWeather();
+    };
   </script>
 </body>
 </html>
