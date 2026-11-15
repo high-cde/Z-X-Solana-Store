@@ -9,6 +9,7 @@ Prototipo di agenzia viaggi + eSIM + store crypto sovrano, integrato nell'ecosis
 - Convertitore valuta (API pubblica).
 - Scudo K.I.R.A. ANTI-SCAM integrato.
 - Collegamento a ZComm per chat cifrata.
+- **Wallet Solana (Phantom) read-only** integrato.
 - Gate $DSN / Solana Pay (SOL/USDC) pianificato.
 - Pannello Starlink (mock / live) da xCLOUD.
 
@@ -26,6 +27,7 @@ python3 -m http.server 8080
 
 ## Integrazioni
 
+- Wallet Solana: `docs/SOLANA-WALLET.md`
 - Scudo K.I.R.A.: vedi `docs/KIRA-SHIELD.md`
 - ZComm: link a repo Zcomm
 - Security Agent: ZDOS-Security-Agent
