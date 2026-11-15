@@ -15,6 +15,7 @@
     .warning { background: #332200; padding: 10px; border-left: 4px solid #ffaa00; }
     .comm { font-size: 0.85em; color: #aaa; margin-top: 10px; }
     #walletInfo { font-size: 0.85em; margin-left: 10px; }
+    .token { font-family: monospace; font-size: 0.8em; word-break: break-all; }
   </style>
 </head>
 <body>
@@ -67,9 +68,13 @@
 
   <div id="store" class="panel" style="display:none">
     <h2>Store Crypto</h2>
-    <p>Solana Pay (SOL / USDC) pianificato. VELVET non usato per bassa liquidità.</p>
+    <p>Solana Pay (SOL / USDC) pianificato.</p>
     <p id="storeWallet">Wallet non collegato.</p>
-    <div class="comm">Comunicazione: pagamento → verifica balance via Æsir/zBAG → conferma. Token $DSN: 35w74RT77BPSYNpmzpvxmR9wu2ihpgzubKy4bkGHR3F4</div>
+    <h3>Token dell'ecosistema</h3>
+    <p><strong>$DSN</strong> (Solana)<br><span class="token">35w74RT77BPSYNpmzpvxmR9wu2ihpgzubKy4bkGHR3F4</span></p>
+    <p><strong>$OV</strong> (VELVET, Solana)<br><span class="token">2EN6Y1zM4yyt41gE2muzdJSAgRCAZiXqnmkgpbrspump</span></p>
+    <p><strong>Polygon</strong><br><span class="token">0xfc90516a1f736FaC557e09D8853dB80dA192c296</span></p>
+    <div class="comm">Comunicazione: pagamento → verifica balance via Æsir/zBAG → conferma.</div>
   </div>
 
   <div id="xcloud" class="panel" style="display:none">
